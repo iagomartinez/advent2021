@@ -6,7 +6,7 @@ THIS_DIR = Path(__file__).parent
 
 class TestDay1(unittest.TestCase):
     def test_day1(self):
-        depths = day1.readdepths(THIS_DIR.parent / 'data/day1_sample.txt')            
+        depths = day1.readdepths(THIS_DIR.parent / 'data/day1_sample.txt') 
         self.assertEqual(10, len(depths))
 
     def test_countdepthincreases(self):
@@ -16,3 +16,11 @@ class TestDay1(unittest.TestCase):
     def test_sampledepths(self):
         depths = day1.readdepths(THIS_DIR.parent /'data/day1_sample.txt')            
         self.assertEqual(7, day1.countdepthincreases(depths))
+
+    def test_windows(self):
+        depths = day1.readdepths(THIS_DIR.parent / 'data/day1_sample.txt')
+        sums = day1.slidingwindows(depths)
+        print(sums)
+        self.assertEqual(8, len(sums))
+        result = day1.countdepthincreases(sums)
+        self.assertEqual(5, result)

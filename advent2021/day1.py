@@ -10,6 +10,14 @@ def readdepths(file):
         depths = [int(line)for line in f]
     return depths
 
+def slidingwindows(depths, windowsize = 3):
+    slice = depths[:-(windowsize-1)]    
+    windows = []
+    for i, _ in enumerate(slice):
+        w = depths[i:i+windowsize]
+        windows.append(sum(w))
+    return windows
+
 def countdepthincreases(depths):
     t0 = time.perf_counter()
     slice0 = depths[:-1]
@@ -23,6 +31,9 @@ def main():
     print('----------- day1 -----------')
     depths = readdepths(THIS_DIR.parent / 'data/day1_p1.txt')
     print(f'For first ⭐: {countdepthincreases(depths)}')
+
+    windows = slidingwindows(depths)
+    print(f'For ⭐⭐: {countdepthincreases(windows)}')
 
 if __name__ == '__main__':
     sys.exit(main())
