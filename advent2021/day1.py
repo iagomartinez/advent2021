@@ -1,6 +1,9 @@
 import sys
 import time
 
+from pathlib import Path
+THIS_DIR = Path(__file__).parent
+
 def readdepths(file):
     depths = []
     with open(file, 'r', newline='', encoding='utf-8') as f:
@@ -18,6 +21,8 @@ def countdepthincreases(depths):
 
 def main():
     print('----------- day1 -----------')
+    depths = readdepths(THIS_DIR.parent / 'data/day1_p1.txt')
+    print(f'For first ⭐: {countdepthincreases(depths)}')
 
 if __name__ == '__main__':
     sys.exit(main())
