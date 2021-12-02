@@ -18,17 +18,30 @@ def readlines(file):
                 moves.append((0,-int(v)))
     return moves
 
-def calculateposition(input):
+def simpleposition(input):
     pos,depth = reduce(lambda p0,p1: (p0[0]+ p1[0], p0[1] + p1[1]), input)
     print(f'final position:{pos}, depth:{depth}')
     return pos,depth
+
+def positionwithaim(input):
+    pos, depth, aim = 0,0,0
+    for p,d in input:
+        aim += d
+        pos += p
+        depth += p * aim
+
+    print(f'final position:{pos}, aim:{aim}, depth:{depth}')
+    return pos, depth
 
 def main():
     print('----------- day2 -----------')
     
     input = readlines(THIS_DIR.parent / 'data/day2_p1.txt')
-    pos,depth = calculateposition(input)
+    pos,depth = simpleposition(input)
     print(f'For first ⭐: {pos * depth}')
+
+    pos,depth = positionwithaim(input)
+    print(f'For ⭐⭐: {pos * depth}')
 
 if __name__ == '__main__':
     sys.exit(main())
