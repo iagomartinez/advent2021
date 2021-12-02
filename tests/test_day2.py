@@ -1,9 +1,6 @@
-import sys
 import unittest
 from context import day2
 from pathlib import Path
-from functools import reduce
-
 THIS_DIR = Path(__file__).parent
 
 class Tests(unittest.TestCase):
@@ -21,7 +18,6 @@ class Tests(unittest.TestCase):
     def test_positionwithaim(self):
         input = day2.readlines(THIS_DIR.parent / 'data/day2_sample.txt')
         pos,depth = day2.positionwithaim(input)
-        
         self.assertEqual(15, pos)
         self.assertEqual(60, depth)
         self.assertEqual(900, pos * depth)
