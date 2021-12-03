@@ -40,8 +40,8 @@ def computerates(counters):
     gamma = []
     epsilon = []
     for i in counters.keys():
-        gamma.append(counters[i].most_common()[0][0])
-        epsilon.append(counters[i].most_common()[1][0])
+        gamma.append(most_common(counters[i]))
+        epsilon.append(least_common(counters[i]))
     return to_number(gamma), to_number(epsilon)
 
 def applycriteria(position, rows, criteria):
@@ -60,7 +60,7 @@ def computerating(input, counters, criteria):
     return to_number(input[0])
 
 def computelifesupportrates(input, counters):
-    oxygen_criteria = lambda counter:  1 if counter[0] == counter[1] else most_common(counter)
+    oxygen_criteria = lambda counter: 1 if counter[0] == counter[1] else most_common(counter)
     oxygen_rating = computerating(input,counters, oxygen_criteria)
 
     co2scrubber_criteria = lambda counter: 0 if counter[0] == counter[1] else least_common(counter)
