@@ -22,3 +22,16 @@ class Tests(unittest.TestCase):
 
         self.assertEqual(22, gamma)
         self.assertEqual(9, epsilon)
+    
+    def test_bitcriteria(self):
+        file = THIS_DIR.parent / 'data/day3_sample.txt'
+        
+        report = day3.readbits(file)
+        counters = day3.countbits(report)
+
+        oxyygengenerator, co2scrubber = day3.computelifesupportrates(report, counters)
+
+        self.assertEqual(23, oxyygengenerator)
+        self.assertEqual(10, co2scrubber)
+
+
