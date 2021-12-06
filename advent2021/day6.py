@@ -48,17 +48,11 @@ def buildfishindex(startingpoints):
 def faster_simulate(generations, startingpoints,verbose=False):
     t0 = time.perf_counter()    
     fishindex = buildfishindex(startingpoints)
-    print(fishindex)
+
     for _ in range(generations):        
-        new_index = {}
-        for t in range(8,0,-1):            
-            if t in fishindex:
-                new_index[t-1] = fishindex[t]
-            else:
-                new_index[t-1] = 0
-        if 0 in fishindex:
-            new_index[8] = fishindex[0]        
-            new_index[6] += fishindex[0]
+        new_index = {t-1:fishindex.get(t,0) for t in range(8,0,-1)}
+        new_index[8] = fishindex.get(0,0)        
+        new_index[6] += fishindex.get(0,0)
         fishindex = dict(new_index)
 
     t1 = time.perf_counter()
