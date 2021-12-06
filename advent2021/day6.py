@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 THIS_DIR = Path(__file__).parent
+import time
 
 def closure(seed=8):
     inner_seed = seed
@@ -18,6 +19,7 @@ def closure(seed=8):
     return inner
 
 def simulate(generations, startingpoints,verbose=False):
+    t0 = time.perf_counter()    
     fish = [closure(t) for t in startingpoints]
     for _ in range(generations):
         new_fish = []
@@ -30,7 +32,39 @@ def simulate(generations, startingpoints,verbose=False):
         if verbose: 
             print()
         fish.extend(new_fish)
+    t1 = time.perf_counter()
+    print(f"Simulation for {generations} gen with {len(startingpoints)} 🐟: {t1 - t0:0.4f} seconds")
     return fish
+
+def buildfishindex(startingpoints):
+    fish = {}
+    for t in startingpoints:
+        if t in fish:
+            fish[t] += 1
+        else:
+            fish[t] = 1 
+    return fish
+
+def faster_simulate(generations, startingpoints,verbose=False):
+    t0 = time.perf_counter()    
+    fishindex = buildfishindex(startingpoints)
+    print(fishindex)
+    for _ in range(generations):        
+        new_index = {}
+        for t in range(8,0,-1):            
+            if t in fishindex:
+                new_index[t-1] = fishindex[t]
+            else:
+                new_index[t-1] = 0
+        if 0 in fishindex:
+            new_index[8] = fishindex[0]        
+            new_index[6] += fishindex[0]
+        fishindex = dict(new_index)
+
+    t1 = time.perf_counter()
+    print(f"Simulation for {generations} gen with {len(startingpoints)} 🐟: {t1 - t0:0.4f} seconds")
+
+    return fishindex
 
 def main():
     print('----------- day6 -----------')
@@ -40,6 +74,8 @@ def main():
     
     print(f'For first ⭐: after 80 days there are {len(fish)} 🐟')
 
-
+    fishindex = faster_simulate(256, startingpoints)
+    print(f'For ⭐⭐: after 256 days there are {sum(fishindex.values())} 🐟')
+    
 if __name__ == '__main__':
     sys.exit(main())
