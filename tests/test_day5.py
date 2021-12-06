@@ -25,10 +25,9 @@ class Tests(unittest.TestCase):
     def test_selectlines(self):
         file = THIS_DIR.parent / 'data/day5_sample.txt'
         coordinates= day5.parsefile(file)
-        horz, vert = day5.selectlines(coordinates)
+        horz, vert, _ = day5.selectlines(coordinates)
         self.assertCountEqual([(0, 9, 5, 9),(9, 4, 3, 4), (0, 9, 2, 9), (3, 4, 1, 4)], horz)
         self.assertCountEqual([(2, 2, 2, 1),(7, 0, 7, 4)], vert)
-
 
     def test_buildindex(self):
         file = THIS_DIR.parent / 'data/day5_sample.txt'    
@@ -36,3 +35,15 @@ class Tests(unittest.TestCase):
         print(dangerpoints)
         self.assertEqual(5, len(dangerpoints))
 
+    def test_includediagonals(self):
+        file = THIS_DIR.parent / 'data/day5_sample.txt'    
+        dangerpoints = day5.finddangerpoints(file, True)
+        print(dangerpoints)
+        self.assertEqual(12, len(dangerpoints))
+
+    def test_calcdiagonal(self):
+        coords = day5.calcdiagonal(1,1,3,3)
+        self.assertCountEqual([(1,1),(2,2),(3,3)], coords)
+
+        coords = day5.calcdiagonal(9,7,7,9)
+        self.assertCountEqual([(9,7),(8,8),(7,9)], coords)
