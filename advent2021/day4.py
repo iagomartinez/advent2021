@@ -11,7 +11,6 @@ def readrow(line):
 
 def buildindex(boards):
     index = {}
-    #for i, board in enumerate(boards):
     for i, board in boards.items():
         boardindex = []
         for line in board:
@@ -61,6 +60,40 @@ def drawnumbers(number_order, index):
     score = sum([line[1] for line in index[winning_board]][0:5]) * last_draw
     return last_draw, winning_board, score
 
+def drawnumbers_tolastboard(number_order, index):
+    last_draw = None
+    last_board = None
+    all_won = None
+    winning_boards = set()
+    for draw in number_order:
+        for i, boardindex in index.items():
+            if i not in winning_boards:
+                for line in boardindex:
+                    if draw in line[0] and line[1] != 0:
+                        print(f'MATCH {draw}')
+                        line[1] -= draw
+                        if line[1] < 0:
+                            print(i, boardindex)
+                            raise "below 0"
+                        assert(line[1] >= 0)
+                        if line[1] == 0:
+                            last_draw = draw
+                            winning_boards.add(i)
+                            print(f"BINGO!! board {i}")     
+                            last_board = i                       
+                            if len(winning_boards) == len(index):
+                                all_won = True
+                            break
+            if all_won:
+                break
+        if all_won:
+            break
+
+    print(index[last_board])
+    
+    score = sum([line[1] for line in index[last_board]][0:5]) * last_draw
+    return last_draw, last_board, score
+
 def main():
     print('----------- day4 -----------')
 
@@ -69,10 +102,11 @@ def main():
     index = buildindex(boards)
     assert(len(index) == 100)
     _, winning_board, score = drawnumbers(number_order, index)
-
-
     print(f'For first ⭐: winning board:{winning_board}, score: {score}')
 
+    index = buildindex(boards)
+    _, last_board, score = drawnumbers_tolastboard(number_order, index)
+    print(f'For ⭐⭐: last board:{last_board}, score: {score}')
 
 if __name__ == '__main__':
     sys.exit(main())

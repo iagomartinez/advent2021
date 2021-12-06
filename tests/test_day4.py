@@ -32,7 +32,6 @@ class Tests(unittest.TestCase):
         file = THIS_DIR.parent / 'data/day4_sample.txt'
         number_order, boards = day4.readnumbers(file)
         print(boards)
-
         index = day4.buildindex(boards)
         self.assertEqual(3, len(index))
 
@@ -44,3 +43,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(24, last_draw)
         self.assertEqual(2, winning_board)
         self.assertEqual(4512, score)
+
+    def test_drawnumber(self):
+        file = THIS_DIR.parent / 'data/day4_sample.txt'
+        number_order, boards = day4.readnumbers(file)
+        index = day4.buildindex(boards)
+        last_draw, last_board, score = day4.drawnumbers_tolastboard(number_order, index)
+        self.assertEqual(13, last_draw)
+        self.assertEqual(1, last_board)
+        self.assertEqual(1924, score)
