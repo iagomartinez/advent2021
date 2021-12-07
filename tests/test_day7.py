@@ -5,16 +5,12 @@ import context
 from collections import Counter
 from functools import reduce
 import time
+from advent2021 import day7
 THIS_DIR = Path(__file__).parent
 
 class Tests(unittest.TestCase):
-    param_list = [([1,10,12]), ([1,2,3,4,5,6,7,8,9,10]), ([1,2,3,8,9,10])]
-
     def test_approaches(self):
-        #   Test: if I assume the answer is always one of the positions in the set, is that always correct?
-        #   Test a case where the midpoint is not in the set: e.g. a set skewed to 1 side: 1,10,12            
-        
-        def fn1(input):
+        def scanall(input):
             cnt = Counter(input)
             print(cnt)
             totals = []
@@ -22,16 +18,20 @@ class Tests(unittest.TestCase):
                 totals.append(reduce((lambda tot, next: tot if next == c1 else tot+abs(next-c1)*cnt[next]), cnt,0))
             return totals
         
-        def fn2(input):
-            cnt = Counter(input)
-            print(cnt)
-            totals = []
-            for c1 in cnt:
-                totals.append(reduce((lambda tot, next: tot if next == c1 else tot+abs(next-c1)*cnt[next]), cnt,0))
-            return totals
-
-        for input in self.param_list:
+        for input in [([1,10,12]), ([1,2,3,4,5,6,7,8,9,10]), ([1,2,3,8,9,10])]:
             with self.subTest(msg=f'Testing {input}:', input=input):
-                totals1 = fn1(input)
-                totals2 = fn2(input)
-                self.assertEqual(min(totals1), min(totals2))        
+                totals1 = scanall(input)
+                totals2 = day7.crabfuel(input)
+                self.assertEqual(min(totals1), min(totals2))
+
+    def test_burnrate(self):
+        inputs = [(5,16,66),(1,5,10),(2,5,6),(0,5,15),(4,5,1),(2,5,6),(7,5,3),(1,5,10),(2,5,6),(14,5,45)]
+        for start, to, burn in inputs:
+            with self.subTest(msg=f'Fuel burn test start:{start}, to:{to}:'):
+                self.assertEqual(burn, day7.incrementalburn(0,start,to,1))
+
+    def test_incrementalburn(self):
+        input = 16,1,2,0,4,2,7,1,2,14
+        totals = day7.crabfuel(input,burncalc=day7.incrementalburn)
+        print(totals)
+        self.assertEqual(168, min(totals))
