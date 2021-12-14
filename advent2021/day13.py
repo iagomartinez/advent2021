@@ -50,6 +50,18 @@ def fold(point, foldline):
         return  newpos(x, foldx), y
     raise 'unknown case' 
 
+def printpoints(points, maxpoint):
+    maxx, maxy = maxpoint
+
+    print('----------------------')
+    for y in range(maxy + 1):
+        for x in range(maxx + 1):
+            if (x,y) in points:
+                print('#', end='')
+            else:
+                print('.', end='')
+        print('')
+
 def main():
     print('----------- day13 -----------')
     file = THIS_DIR.parent / 'data/day13.txt'
@@ -59,5 +71,18 @@ def main():
 
     print(f'For first ⭐: {len(folded)}')
 
+    maxx = max([x for x,_ in points])
+    maxy = max([y for _,y in points])
+
+    for f in folds:
+        foldx, foldy = f
+        if (foldy):
+            maxy = foldy - 1
+        if (foldx):
+            maxx = foldx - 1
+        points = foldpoints(points, f)
+    print(f'For ⭐⭐')
+    printpoints(points, (maxx, maxy))
+    
 if __name__ == '__main__':
     sys.exit(main())

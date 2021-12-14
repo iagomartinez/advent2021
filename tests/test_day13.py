@@ -59,5 +59,3 @@ class Tests(unittest.TestCase):
         self.assertCountEqual({(6,4)}, folded)
 
 
-
-
