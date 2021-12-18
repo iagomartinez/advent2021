@@ -11,17 +11,19 @@ class Fixtures():
     def __init__(self):
         self.samplechitons = None
     
+    def samplefilepath(self):
+        return THIS_DIR.parent / 'data/day15_sample.txt'
+
     def sample(self):
         if self.samplechitons:
             return self.samplechitons
-        file = THIS_DIR.parent / 'data/day15_sample.txt'                
+        file = THIS_DIR.parent / 'data/day15_sample.txt'
         self.samplechitons = day15.readchitons(file)
         return self.samplechitons
 
 fixtures = Fixtures()
 
 class Tests(unittest.TestCase):
-    
     def test_dayn(self):        
         chitons = fixtures.sample()
         self.assertCountEqual([1,1,6,3,7,5,1,7,4,2], chitons[0])
@@ -49,17 +51,35 @@ class Tests(unittest.TestCase):
             with self.subTest(f'testing {start}->{end}'):
                 self.assertEqual(score, day15.manhattan(start, end))
         
-
     def test_astar(self):
-        chitons = fixtures.sample()
-        endx = len(chitons[0]) - 1
-        endy = len(chitons) - 1      
+        chitonmap = day15.ChitonMap(fixtures.samplefilepath())
+        endx = chitonmap.maxx
+        endy = chitonmap.maxy
         with Timer():
-            winner = day15.astar(chitons, (0,0), (endx,endy), day15.manhattan)
-        self.assertEqual(40, winner)
+            winner = day15.astar(chitonmap, (0,0), (endx,endy), day15.manhattan)
+        self.assertEqual(315, winner)
 
+    def test_mapposition(self):
+        map = day15.ChitonMap(fixtures.samplefilepath())
+        testcases = [[(0,0),(0,0)], [(10,1),(0,1)], [(1,1),(1,1)], [(49,0),(9,0)], [(0,49),(0,9)]]
+        for input, output in testcases:
+            with self.subTest(msg=f'parse pattern {input}:'):            
+                self.assertEqual(output, map.mapposition(input))
+    
+    def test_maxxmaxy(self):
+        map = day15.ChitonMap(fixtures.samplefilepath())
+        self.assertEqual((49,49), (map.maxx, map.maxy))
 
-
-
-
-
+    def test_risklevel(self):
+        map = day15.ChitonMap(fixtures.samplefilepath())        
+        testcases = [[(1,1),1,1],
+        [(10,1),1,2],[(19,1),1,2],[(20,1),1,3], 
+        [(29,1),1,3],[(30,1),1,4],[(39,1),1,4],[(40,1),1,5], 
+        [(49,1),1,5],
+        [(10,1),9,1], # 9 goes back to 1
+        [(10,10),9,2],
+        [(1,49),1,5],
+        [(49,49),1,9]]
+        for position,chitons,risk in testcases:
+            with self.subTest(msg=f'testing {position}'):
+                self.assertEqual(risk, map.risklevel(chitons, position))

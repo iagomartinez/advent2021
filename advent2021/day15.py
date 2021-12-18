@@ -1,9 +1,38 @@
 from os import path
 import sys
 from pathlib import Path
-from utils import Timer
+from advent2021.utils import Timer
 
 THIS_DIR = Path(__file__).parent
+
+class ChitonMap():
+    def __init__(self, file):
+        with open(file, 'r', newline='', encoding='utf-8') as f:
+            self._chitontile = [list(map(lambda x: int(x), list(line.rstrip()))) for line in f]
+            self.__lenx = len(self._chitontile[0])
+            self.__leny = len(self._chitontile)
+            self.maxx = (self.__lenx * 5) - 1
+            self.maxy = (self.__leny * 5) - 1
+
+    def mapposition(self, pos):
+        x,y = pos
+        relativex = x % self.__lenx
+        relativey = y % self.__leny
+        return relativex, relativey
+
+    def risklevel(self, chitonvalue, pos):
+        x,y = pos
+        extra_risk = x // self.__lenx + y // self.__leny
+        chitonrisk = chitonvalue + extra_risk
+        if chitonrisk > 9:
+            chitonrisk -= 9
+        return chitonrisk
+
+    def chitonrisk(self, pos):
+        x, y = self.mapposition(pos)
+        assert x < self.__lenx, f'{x} >= {self.__lenx}'
+        assert y < self.__leny, f'{y} >= {self.__leny}'
+        return self.risklevel(self._chitontile[y][x], pos)
 
 def readchitons(file):
     with open(file, 'r', newline='', encoding='utf-8') as f:
@@ -11,8 +40,7 @@ def readchitons(file):
 
 def walk(chitons, x=0, y=0):
     maxx = len(chitons[0]) - 1
-    maxy = len(chitons) - 1      
-
+    maxy = len(chitons) - 1
     visited = 0
     def walk_inner(x,y, path):
         nonlocal visited
@@ -108,18 +136,19 @@ def manhattan(current, goal):
 
 #   Credit to https://www.geeksforgeeks.org/a-search-algorithm/ 
 #   for the pseudocode that inspired this function 🙏
-def astar(chitons, start, goal, h):
+def astar(chitonmap, start, goal, h):
     openset = {start}
     camefrom = dict()
     gscore = {start: 0}
     fscore = {start:h(start, goal)}
     get_g = lambda pos: gscore.get(pos, 999)
+    goalx,goaly = goal
 
     def find_neighbours(current):
         x,y = current
-        if x < len(chitons[0]) - 1:
+        if x < goalx:
             yield x+1, y
-        if y < len(chitons) - 1:
+        if y < goaly:
             yield x, y+1
 
     while len(openset) > 0:
@@ -129,7 +158,7 @@ def astar(chitons, start, goal, h):
         openset.remove(current)
         for neighbour in find_neighbours(current):
             xn, yn = neighbour
-            tentativescore = get_g(current) + chitons[yn][xn]            
+            tentativescore = get_g(current) + chitonmap.chitonrisk((xn,yn))            
             neighbourscore = get_g(neighbour)
             if tentativescore < neighbourscore:
                 camefrom[neighbour] = current
