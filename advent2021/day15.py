@@ -1,7 +1,6 @@
 from os import path
 import sys
 from pathlib import Path
-from advent2021.utils import Timer
 
 THIS_DIR = Path(__file__).parent
 
@@ -9,20 +8,20 @@ class ChitonMap():
     def __init__(self, file):
         with open(file, 'r', newline='', encoding='utf-8') as f:
             self._chitontile = [list(map(lambda x: int(x), list(line.rstrip()))) for line in f]
-            self.__lenx = len(self._chitontile[0])
-            self.__leny = len(self._chitontile)
-            self.maxx = (self.__lenx * 5) - 1
-            self.maxy = (self.__leny * 5) - 1
+            self.tilex = len(self._chitontile[0])
+            self.tiley = len(self._chitontile)
+            self.maxx = (self.tilex * 5) - 1
+            self.maxy = (self.tiley * 5) - 1
 
     def mapposition(self, pos):
         x,y = pos
-        relativex = x % self.__lenx
-        relativey = y % self.__leny
+        relativex = x % self.tilex
+        relativey = y % self.tiley
         return relativex, relativey
 
     def risklevel(self, chitonvalue, pos):
         x,y = pos
-        extra_risk = x // self.__lenx + y // self.__leny
+        extra_risk = x // self.tilex + y // self.tiley
         chitonrisk = chitonvalue + extra_risk
         if chitonrisk > 9:
             chitonrisk -= 9
@@ -30,8 +29,8 @@ class ChitonMap():
 
     def chitonrisk(self, pos):
         x, y = self.mapposition(pos)
-        assert x < self.__lenx, f'{x} >= {self.__lenx}'
-        assert y < self.__leny, f'{y} >= {self.__leny}'
+        assert x < self.tilex, f'{x} >= {self.tilex}'
+        assert y < self.tiley, f'{y} >= {self.tiley}'
         return self.risklevel(self._chitontile[y][x], pos)
 
 def readchitons(file):
@@ -141,13 +140,17 @@ def astar(chitonmap, start, goal, h):
     camefrom = dict()
     gscore = {start: 0}
     fscore = {start:h(start, goal)}
-    get_g = lambda pos: gscore.get(pos, 999)
+    get_g = lambda pos: gscore.get(pos, float('inf'))
     goalx,goaly = goal
 
     def find_neighbours(current):
         x,y = current
+        if x > 0:
+            yield x-1, y
         if x < goalx:
             yield x+1, y
+        if y > 0:
+            yield x, y-1
         if y < goaly:
             yield x, y+1
 
@@ -171,12 +174,18 @@ def astar(chitonmap, start, goal, h):
 def main():
     file =  THIS_DIR.parent / 'data/day15.txt'
     print('----------- day15 -----------')
-    with Timer():
-        chitons = readchitons(file)
-        endx = len(chitons[0]) - 1
-        endy = len(chitons) - 1                  
-        winner = astar(chitons, (0,0), (endx,endy), manhattan)
+    map = ChitonMap(file)
+    endx = map.tilex - 1
+    endy = map.tiley - 1
+    winner = astar(map, (0,0), (endx, endy), manhattan)
     print(f'For first ⭐: shortest path is {winner}')
+
+    map = ChitonMap(file)
+    endx = map.maxx
+    endy = map.maxy
+    print(f'0,0 -> {endx, endy}')
+    winner = astar(map, (0,0), (endx,endy), manhattan)
+    print(f'For ⭐⭐: extended grid path is {winner}')
 
 if __name__ == '__main__':
     sys.exit(main())

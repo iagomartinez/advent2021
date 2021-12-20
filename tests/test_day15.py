@@ -3,7 +3,8 @@ import unittest
 from pathlib import Path
 import context
 from advent2021 import day15
-from advent2021.utils import Timer
+#import advent2021
+#from advent2021.utils import Timer
 
 THIS_DIR = Path(__file__).parent
 
@@ -13,6 +14,9 @@ class Fixtures():
     
     def samplefilepath(self):
         return THIS_DIR.parent / 'data/day15_sample.txt'
+
+    def fullfilepath(self):
+        return THIS_DIR.parent / 'data/day15.txt'
 
     def sample(self):
         if self.samplechitons:
@@ -31,16 +35,14 @@ class Tests(unittest.TestCase):
 
     def test_walk(self):
         chitons = fixtures.sample()
-        with Timer():
-            paths = day15.walk(chitons)
+        paths = day15.walk(chitons)
         print(f'paths: {len(paths)}')
         shortestpath = day15.shortest(paths, chitons)
         self.assertEqual(40, shortestpath[0])
 
     def test_walkfaster(self):
         chitons = fixtures.sample()
-        with Timer():
-            paths = day15.walkfaster(chitons)
+        paths = day15.walkfaster(chitons)
         print(f'paths: {len(paths)}')
         winner = day15.shortestv2(paths)
         self.assertEqual(40, winner[0])
@@ -55,8 +57,7 @@ class Tests(unittest.TestCase):
         chitonmap = day15.ChitonMap(fixtures.samplefilepath())
         endx = chitonmap.maxx
         endy = chitonmap.maxy
-        with Timer():
-            winner = day15.astar(chitonmap, (0,0), (endx,endy), day15.manhattan)
+        winner = day15.astar(chitonmap, (0,0), (endx,endy), day15.manhattan)
         self.assertEqual(315, winner)
 
     def test_mapposition(self):
@@ -83,3 +84,21 @@ class Tests(unittest.TestCase):
         for position,chitons,risk in testcases:
             with self.subTest(msg=f'testing {position}'):
                 self.assertEqual(risk, map.risklevel(chitons, position))
+
+    def test_maxx_y(self):
+        map = day15.ChitonMap(fixtures.fullfilepath())
+        self.assertEqual((499,499), (map.maxx, map.maxy))
+
+    def test_bigmap(self):
+        map = day15.ChitonMap(fixtures.fullfilepath())
+        lowercorner = [   [(99,99),1], [(99,199),2],[(199,199),3],
+                        [(199,99),2], [(199,199),3],
+                        [(499,99),5], [(99,499),5], [(499,499),9]]
+        for position, risk in lowercorner:
+            with self.subTest(msg='chitonrisk of lower corner {position}, expected: {risk}'):
+                self.assertEqual(risk, map.chitonrisk(position))
+
+        valueofeight = [   [(97,99),8], [(197,99),9], [(297,99),1]]
+        for position, risk in valueofeight:
+            with self.subTest(msg='chitonrisk of start value 8 {position}, expected: {risk}'):
+                self.assertEqual(risk, map.chitonrisk(position))                
