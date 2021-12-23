@@ -9,7 +9,6 @@ def deterministicroll(start = 1):
         nonlocal roll        
         current = roll
         roll = (roll % 100) + 1
-        print(current,end=',')
         return current 
     return inner
 
@@ -39,7 +38,6 @@ def game(startpositions, roll):
         timesrolled += 3
         board.play(moves)
         p1,p2 = board.scores()     
-        print(f'scores after {timesrolled} rolls: {p1,p2}')       
         if p1 >= 1000:
             loser = p2
             break
@@ -48,11 +46,31 @@ def game(startpositions, roll):
             break
     return timesrolled, loser
 
+def quantumgame(positions, scores, universes, player):
+    p1,p2 = scores
+    if p1>=21:
+        return universes,0
+    elif p2>=21:
+        return 0,universes
+    wins = [0,0]
+    for moves,times in [(3,1), (4,3), (5,6), (6,7), (7,6), (8,3), (9,1)]:
+        newpositions = list(positions)
+        newpositions[player] = ((positions[player] + moves - 1) % 10) + 1
+        newscores = list(scores)
+        newscores[player] += newpositions[player]
+        w1,w2 = quantumgame(newpositions, newscores, universes * times, not player)
+        wins[0] += w1
+        wins[1] += w2
+    return tuple(wins)
+
+
 def main():
     print('----------- day21 -----------')
     timesrolled, loser = game([9,4], deterministicroll())
     print(f'For first ⭐: times rolled {timesrolled}, losing score {loser}, solution: {timesrolled*loser}')
 
+    w1, w2 = quantumgame([9,4],[0,0],1,0)
+    print(f'For ⭐⭐: scores {w1,w2}, winning universes {max(w1,w2)}')
 
 if __name__ == '__main__':
     sys.exit(main())

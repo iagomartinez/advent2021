@@ -5,6 +5,8 @@ import context
 from advent2021.day21 import deterministicroll
 from advent2021.day21 import Board
 from advent2021.day21 import game
+from advent2021.day21 import quantumgame
+
 
 THIS_DIR = Path(__file__).parent       
 
@@ -46,3 +48,8 @@ class Tests(unittest.TestCase):
         timesrolled,loser = game((4,8), deterministicroll())        
         self.assertEqual(993, timesrolled)
         self.assertEqual(745,loser)
+
+    def test_quantumgame(self):
+        w1, w2 = quantumgame([4,8],[0,0],1,0)
+        print(w1,w2)
+        self.assertEqual(444356092776315, w1)
